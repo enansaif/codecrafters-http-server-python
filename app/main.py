@@ -5,7 +5,7 @@ def main():
     server_socket = socket.create_server(("localhost", 4221), reuse_port=True)
     while True:
         conn, _ = server_socket.accept() 
-        msg = conn.recv().decode("utf-8")
+        msg = conn.recv(1024).decode("utf-8")
         print(msg)
         conn.close()
 
