@@ -18,7 +18,7 @@ def main():
             \r\n
             {msg}           
         """
-        client.send(response)
+        client.send(response.encode())
         client.close()
 
 if __name__ == "__main__":
