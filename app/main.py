@@ -6,7 +6,12 @@ def main():
     while True:
         conn, _ = server_socket.accept() 
         msg = conn.recv(1024).decode("utf-8")
-        print(msg)
+        request = msg.split("\r\n")
+        target = request[0].split(" ")[1]
+        if target == "/":
+            conn.send(b"HTTP/1.1 200 OK\r\n\r\n")
+        else:
+            conn.send(b"HTTP/1.1 404 Not Found\r\n\r\n")
         conn.close()
 
 if __name__ == "__main__":
