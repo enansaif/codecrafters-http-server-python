@@ -4,15 +4,22 @@ import socket
 def main():
     server_socket = socket.create_server(("localhost", 4221), reuse_port=True)
     while True:
-        conn, _ = server_socket.accept() 
-        msg = conn.recv(1024).decode("utf-8")
-        request = msg.split("\r\n")
-        target = request[0].split(" ")[1]
-        if target == "/":
-            conn.send(b"HTTP/1.1 200 OK\r\n\r\n")
-        else:
-            conn.send(b"HTTP/1.1 404 Not Found\r\n\r\n")
-        conn.close()
+        client, _ = server_socket.accept() 
+        request = client.recv(1024).decode("utf-8")
+        status_lint = request.split("\r\n")[0]
+        target = status_lint.split(" ")[1]
+        msg = target.split("/")[-1]
+        
+        response = f"""
+            HTTP/1.1 200 OK
+            \r\n
+            Content-Type: text/plain\r\n
+            Content-Length: {len(msg)}\r\n
+            \r\n
+            {msg}           
+        """
+        client.send(response)
+        client.close()
 
 if __name__ == "__main__":
     main()
