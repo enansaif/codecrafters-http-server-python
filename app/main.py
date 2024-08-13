@@ -10,14 +10,7 @@ def main():
         target = status_lint.split(" ")[1]
         msg = target.split("/")[-1]
         
-        response = f"""
-            HTTP/1.1 200 OK
-            \r\n
-            Content-Type: text/plain\r\n
-            Content-Length: {len(msg)}\r\n
-            \r\n
-            {msg}           
-        """
+        response = f"HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\nContent-Length: {len(msg)}\r\n\r\n{msg}"
         client.send(response.encode())
         client.close()
 
