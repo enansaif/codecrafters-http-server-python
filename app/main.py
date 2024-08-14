@@ -71,6 +71,10 @@ def request_handler(client):
         metadata["headers"]["Content-Length"] = len(content)
         metadata["body"] = content
         file.close()
+    elif request_path[1] == "files" and request.method == "POST":
+        file = open(sys.argv[2] + request_path[-1], 'w')
+        file.write(request.body)
+        file.close()
     else:
         metadata["status_code"] = 404
         metadata["status_text"] = "Not Found"
