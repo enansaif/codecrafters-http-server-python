@@ -64,6 +64,7 @@ def request_handler(client):
         metadata["headers"]["Content-Length"] = len(request_path[-1])
         metadata["body"] = request_path[-1]
     elif request_path[1] == "files" and os.path.isfile(request_path[-1]):
+        print(request_path)
         file = open(request_path[-1], 'r')
         content = file.read()
         metadata["headers"]["Content-Type"] = "application/octet-stream"
