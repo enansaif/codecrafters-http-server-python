@@ -36,7 +36,8 @@ class HTTPResponse():
         status_line = [self.version, str(self.status_code), self.status_text]
         status_line = ' '.join(status_line)
         headers = '\r\n'.join([k+": "+str(v) for k, v in self.headers.items()])
-        response = '\r\n'.join([status_line, headers, self.body])
+        response = '\r\n'.join([status_line, headers])
+        response += '\r\n' + self.body
         return response.encode('utf-8')
 
 def request_handler(client):
