@@ -1,3 +1,4 @@
+import os
 import socket
 import threading
 from typing import Dict
@@ -50,18 +51,25 @@ def request_handler(client):
         "status_text": "OK",
         "body": "",
     }
-    if request.path == "/":
+    request_path = request.path.split("/")
+    if request_path[1] == "":
         pass
-    elif request.path == "/user-agent":
+    elif request_path[1] == "user-agent":
         user_agent = request.headers["User-Agent"]
         metadata["headers"]["Content-Type"] = "text/plain"
         metadata["headers"]["Content-Length"] = len(user_agent)
         metadata["body"] = user_agent
-    elif request.path[:6] == "/echo/":
-        path = request.path[6:]
+    elif request_path[1] == "echo":
         metadata["headers"]["Content-Type"] = "text/plain"
-        metadata["headers"]["Content-Length"] = len(path)
-        metadata["body"] = path
+        metadata["headers"]["Content-Length"] = len(request_path[-1])
+        metadata["body"] = request_path[-1]
+    elif request_path[1] == "tmp" and os.path.isfile(request_path[-1]):
+        file = open(request_path[-1], 'r')
+        content = file.read()
+        metadata["headers"]["Content-Type"] = "application/octet-stream"
+        metadata["headers"]["Content-Length"] = len(content)
+        metadata["body"] = content
+        file.close()
     else:
         metadata["status_code"] = 404
         metadata["status_text"] = "Not Found"
