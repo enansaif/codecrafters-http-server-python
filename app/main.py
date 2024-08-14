@@ -75,6 +75,8 @@ def request_handler(client):
         file = open(sys.argv[2] + request_path[-1], 'w')
         file.write(request.body)
         file.close()
+        metadata["status_code"] = 201
+        metadata["status_text"] = "Created"
     else:
         metadata["status_code"] = 404
         metadata["status_text"] = "Not Found"
