@@ -1,4 +1,5 @@
 import socket
+import threading
 from typing import Dict
 
 class HTTPRequest:
@@ -30,6 +31,7 @@ class HTTPResponse():
         self.status_code = values["status_code"]
         self.status_text = values["status_text"]
         self.body = values["body"]
+        self.to_bytes()
     
     def to_bytes(self) -> bytes:
         status_line = [self.version, str(self.status_code), self.status_text]
@@ -38,34 +40,41 @@ class HTTPResponse():
         response = '\r\n'.join([status_line, headers, self.body])
         return response.encode('utf-8')
 
+def request_handler(client):
+    request_bytes = client.recv(1024)
+    request = HTTPRequest(request_bytes)
+    values = {
+        "headers": {},
+        "version": "HTTP/1.1",
+        "status_code": 200,
+        "status_text": "OK",
+        "body": "",
+    }
+    if request.path == "/":
+        pass
+    elif request.path == "/user-agent":
+        user_agent = request.headers["User-Agent"]
+        values["headers"]["Content-Type"] = "text/plain"
+        values["headers"]["Content-Length"] = len(user_agent)
+        values["body"] = user_agent
+    elif request.path[:6] == "/echo/":
+        path = request.path[6:]
+        values["headers"]["Content-Type"] = "text/plain"
+        values["headers"]["Content-Length"] = len(path)
+        values["body"] = path
+    else:
+        values["status_code"] = 404
+        values["status_text"] = "Not Found"
+    client.send(HTTPResponse(values))
+    client.close()
+
 def main():
     server_socket = socket.create_server(("localhost", 4221), reuse_port=True)
     while True:
-        client, _ = server_socket.accept() 
-        request_bytes = client.recv(1024)
-        request = HTTPRequest(request_bytes)
-        values = {
-            "headers": {},
-            "version": "HTTP/1.1",
-            "status_code": 200,
-            "status_text": "OK",
-            "body": "",
-        }
-        if request.path == "/user-agent":
-            user_agent = request.headers["User-Agent"]
-            values["headers"]["Content-Type"] = "text/plain"
-            values["headers"]["Content-Length"] = len(user_agent)
-            values["body"] = user_agent
-        elif request.path[:6] == "/echo/":
-            path = request.path[6:]
-            values["headers"]["Content-Type"] = "text/plain"
-            values["headers"]["Content-Length"] = len(path)
-            values["body"] = path
-        else:
-            values["status_code"] = 404
-            values["status_text"] = "Not Found"
-        client.send(HTTPResponse(values).encode())
-        client.close()
+        client, _ = server_socket.accept()
+        t = threading.Thread(target=request_handler, args=(client,))
+        t.start()
+        
 
 if __name__ == "__main__":
     main()
