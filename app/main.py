@@ -31,7 +31,6 @@ class HTTPResponse():
         self.status_code = values["status_code"]
         self.status_text = values["status_text"]
         self.body = values["body"]
-        self.to_bytes()
     
     def to_bytes(self) -> bytes:
         status_line = [self.version, str(self.status_code), self.status_text]
@@ -65,7 +64,8 @@ def request_handler(client):
     else:
         values["status_code"] = 404
         values["status_text"] = "Not Found"
-    client.send(HTTPResponse(values))
+    response = HTTPResponse(values)
+    client.send(response.to_bytes())
     client.close()
 
 def main():
