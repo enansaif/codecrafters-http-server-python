@@ -1,4 +1,5 @@
 import os
+import sys
 import socket
 import threading
 from typing import Dict
@@ -63,9 +64,8 @@ def request_handler(client):
         metadata["headers"]["Content-Type"] = "text/plain"
         metadata["headers"]["Content-Length"] = len(request_path[-1])
         metadata["body"] = request_path[-1]
-    elif request_path[1] == "files" and os.path.isfile(request_path[-1]):
-        print(request_path)
-        file = open(request_path[-1], 'r')
+    elif request_path[1] == "files" and os.path.isfile(sys.argv[2] + request_path[-1]):
+        file = open(sys.argv[2] + request_path[-1], 'r')
         content = file.read()
         metadata["headers"]["Content-Type"] = "application/octet-stream"
         metadata["headers"]["Content-Length"] = len(content)
