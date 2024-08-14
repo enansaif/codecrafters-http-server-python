@@ -24,13 +24,13 @@ class HTTPRequest:
             key, value = header.split(': ', 1)
             self.headers[key] = value
 
-class HTTPResponse():
-    def __init__(self, values):
-        self.headers = values["headers"]
-        self.version = values["version"]
-        self.status_code = values["status_code"]
-        self.status_text = values["status_text"]
-        self.body = values["body"]
+class HTTPResponse:
+    def __init__(self, metadata):
+        self.headers = metadata["headers"]
+        self.version = metadata["version"]
+        self.status_code = metadata["status_code"]
+        self.status_text = metadata["status_text"]
+        self.body = metadata["body"]
     
     def to_bytes(self) -> bytes:
         status_line = [self.version, str(self.status_code), self.status_text]
@@ -43,7 +43,7 @@ class HTTPResponse():
 def request_handler(client):
     request_bytes = client.recv(1024)
     request = HTTPRequest(request_bytes)
-    values = {
+    metadata = {
         "headers": {},
         "version": "HTTP/1.1",
         "status_code": 200,
@@ -54,18 +54,18 @@ def request_handler(client):
         pass
     elif request.path == "/user-agent":
         user_agent = request.headers["User-Agent"]
-        values["headers"]["Content-Type"] = "text/plain"
-        values["headers"]["Content-Length"] = len(user_agent)
-        values["body"] = user_agent
+        metadata["headers"]["Content-Type"] = "text/plain"
+        metadata["headers"]["Content-Length"] = len(user_agent)
+        metadata["body"] = user_agent
     elif request.path[:6] == "/echo/":
         path = request.path[6:]
-        values["headers"]["Content-Type"] = "text/plain"
-        values["headers"]["Content-Length"] = len(path)
-        values["body"] = path
+        metadata["headers"]["Content-Type"] = "text/plain"
+        metadata["headers"]["Content-Length"] = len(path)
+        metadata["body"] = path
     else:
-        values["status_code"] = 404
-        values["status_text"] = "Not Found"
-    response = HTTPResponse(values)
+        metadata["status_code"] = 404
+        metadata["status_text"] = "Not Found"
+    response = HTTPResponse(metadata)
     client.send(response.to_bytes())
     client.close()
 
