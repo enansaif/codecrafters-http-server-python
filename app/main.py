@@ -40,8 +40,12 @@ class HTTPResponse:
         status_line = ' '.join(status_line)
         headers = '\r\n'.join([k+": "+str(v) for k, v in self.headers.items()])
         response = '\r\n'.join([status_line, headers])
-        response += '\r\n\r\n' + self.body
-        return response.encode('utf-8')
+        response += '\r\n\r\n' 
+        if type(self.body) == str:
+            response += self.body
+            return response.encode('utf-8')
+        response.encode('utf-8')
+        return response + self.body
 
 def request_handler(client):
     request_bytes = client.recv(1024)
@@ -68,7 +72,7 @@ def request_handler(client):
             if "gzip" in encodings:
                 metadata["headers"]["Content-Encoding"] = "gzip"
                 content = request_path[-1].encode("utf-8")
-                gzip_content = str(gzip.compress(content))
+                gzip_content = gzip.compress(content)
                 metadata["headers"]["Content-Length"] = len(gzip_content)
                 metadata["body"] = gzip_content
         else:
