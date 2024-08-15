@@ -1,7 +1,7 @@
 import socket
 import threading
-from utils import HTTPRequest, HTTPResponse
-from functions import *
+from .utils import HTTPRequest, HTTPResponse
+from .functions import *
 
 def request_handler(request_bytes):
     request = HTTPRequest(request_bytes)

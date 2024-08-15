@@ -1,7 +1,7 @@
 import os
 import sys
 import gzip
-from utils import HTTPResponse
+from .utils import HTTPResponse
 
 
 def handle_user_agent(request):
