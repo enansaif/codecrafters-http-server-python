@@ -68,7 +68,7 @@ def request_handler(client):
             if "gzip" in encodings:
                 metadata["headers"]["Content-Encoding"] = "gzip"
                 content = request_path[-1].encode("utf-8")
-                gzip_content = gzip.compress(content).decode("utf-8")
+                gzip_content = str(gzip.compress(content))
                 metadata["headers"]["Content-Length"] = len(gzip_content)
                 metadata["body"] = gzip_content
         else:
