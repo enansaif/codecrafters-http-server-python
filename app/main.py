@@ -62,8 +62,12 @@ def request_handler(client):
         metadata["body"] = user_agent
     elif request_path[1] == "echo":
         metadata["headers"]["Content-Type"] = "text/plain"
-        metadata["headers"]["Content-Length"] = len(request_path[-1])
-        metadata["body"] = request_path[-1]
+        if "Accept-Encoding" in request.headers:
+            if request.headers["Accept-Encoding"] == "gzip":
+                metadata["headers"]["Content-Encoding"] = "gzip"
+        else:
+            metadata["headers"]["Content-Length"] = len(request_path[-1])
+            metadata["body"] = request_path[-1]
     elif request_path[1] == "files" and os.path.isfile(sys.argv[2] + request_path[-1]):
         file = open(sys.argv[2] + request_path[-1], 'r')
         content = file.read()
