@@ -63,7 +63,8 @@ def request_handler(client):
     elif request_path[1] == "echo":
         metadata["headers"]["Content-Type"] = "text/plain"
         if "Accept-Encoding" in request.headers:
-            if request.headers["Accept-Encoding"] == "gzip":
+            encodings = request.headers["Accept-Encoding"].split(", ")
+            if "gzip" in encodings:
                 metadata["headers"]["Content-Encoding"] = "gzip"
         else:
             metadata["headers"]["Content-Length"] = len(request_path[-1])
