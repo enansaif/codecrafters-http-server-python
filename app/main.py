@@ -44,8 +44,7 @@ class HTTPResponse:
         if type(self.body) == str:
             response += self.body
             return response.encode('utf-8')
-        response.encode('utf-8')
-        return b"".join([response, self.body])
+        return b"".join([response.encode('utf-8'), self.body])
 
 def request_handler(client):
     request_bytes = client.recv(1024)
