@@ -1,5 +1,6 @@
 import os
 import sys
+import gzip
 import socket
 import threading
 from typing import Dict
@@ -66,6 +67,10 @@ def request_handler(client):
             encodings = request.headers["Accept-Encoding"].split(", ")
             if "gzip" in encodings:
                 metadata["headers"]["Content-Encoding"] = "gzip"
+                content = request_path[-1].encode("utf-8")
+                gzip_content = gzip.compress(content)
+                metadata["headers"]["Content-Length"] = len(gzip_content)
+                metadata["body"] = gzip_content
         else:
             metadata["headers"]["Content-Length"] = len(request_path[-1])
             metadata["body"] = request_path[-1]
