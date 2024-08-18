@@ -18,10 +18,11 @@ class RequestHandler:
         return self.default_handler()
     
     @staticmethod
-    def default_handler():
+    def default_handler(target):
         response = HTTPResponse()
-        response.status_code = 404
-        response.status_text = "Not Found"
+        if target != '':
+            response.status_code = 404
+            response.status_text = "Not Found"
         return response
     
 def worker(client):
