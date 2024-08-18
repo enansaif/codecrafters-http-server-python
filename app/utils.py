@@ -25,7 +25,7 @@ class HTTPRequest:
 
 
 class HTTPResponse:
-    def __init__(self):
+    def __init__(self) -> None:
         self.headers = {}
         self.version = "HTTP/1.1"
         self.status_code = 200

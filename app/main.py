@@ -3,29 +3,32 @@ import threading
 from .utils import HTTPRequest, HTTPResponse
 from .handlers import *
 
-def request_handler(request_bytes):
-    request = HTTPRequest(request_bytes)
-    request_path = request.path.split("/")
-    handlers = {
-        "user-agent": UserAgentHandler(),
-        "echo": EchoHandler(),
-        "files": FileHandler(),
-    }
-    if request_path[1] == "user-agent":
-        return handlers["user-agent"].handle(request)
-    if request_path[1] == "echo":
-        return handlers["echo"].handle(request)
-    if request_path[1] == "files":
-        return handlers["files"].handle(request)
-    response = HTTPResponse()
-    if request_path[1] != '':
+class RequestHandler:
+    def __init__(self):
+        self.handlers = {
+            "user-agent": UserAgentHandler(),
+            "echo": EchoHandler(),
+            "files": FileHandler(),
+        }
+    
+    def handle_request(self, request):
+        target = request.path.split("/")[1]
+        if target in self.handlers:
+            return self.handlers[target].handle(request)
+        return self.default_handler()
+    
+    @staticmethod
+    def default_handler():
+        response = HTTPResponse()
         response.status_code = 404
         response.status_text = "Not Found"
-    return response
+        return response
     
 def worker(client):
     request_bytes = client.recv(1024)
-    response = request_handler(request_bytes)
+    request = HTTPRequest(request_bytes)
+    request_handler = RequestHandler()
+    response = request_handler.handle_request(request)
     client.send(response.to_bytes())
     client.close()
 
