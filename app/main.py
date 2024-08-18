@@ -15,7 +15,7 @@ class RequestHandler:
         target = request.path.split("/")[1]
         if target in self.handlers:
             return self.handlers[target].handle(request)
-        return self.default_handler()
+        return self.default_handler(target)
     
     @staticmethod
     def default_handler(target):
