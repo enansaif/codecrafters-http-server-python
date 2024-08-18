@@ -12,11 +12,11 @@ def request_handler(request_bytes):
         "files": FileHandler(),
     }
     if request_path[1] == "user-agent":
-        return handlers("user-agent").handle(request)
+        return handlers["user-agent"].handle(request)
     if request_path[1] == "echo":
-        return handlers("echo").handle(request)
+        return handlers["echo"].handle(request)
     if request_path[1] == "files":
-        return handlers("files").handle(request)
+        return handlers["files"].handle(request)
     response = HTTPResponse()
     if request_path[1] != '':
         response.status_code = 404
