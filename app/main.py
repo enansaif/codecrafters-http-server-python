@@ -1,17 +1,22 @@
 import socket
 import threading
 from .utils import HTTPRequest, HTTPResponse
-from .functions import *
+from .handlers import *
 
 def request_handler(request_bytes):
     request = HTTPRequest(request_bytes)
     request_path = request.path.split("/")
+    handlers = {
+        "user-agent": UserAgentHandler(),
+        "echo": EchoHandler(),
+        "files": FileHandler(),
+    }
     if request_path[1] == "user-agent":
-        return handle_user_agent(request)
+        return handlers("user-agent").handle(request)
     if request_path[1] == "echo":
-        return handle_echo(request, request_path[-1])
+        return handlers("echo").handle(request)
     if request_path[1] == "files":
-        return handle_files(request, request_path[-1])
+        return handlers("files").handle(request)
     response = HTTPResponse()
     if request_path[1] != '':
         response.status_code = 404
